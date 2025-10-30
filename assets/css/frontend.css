@@ -309,12 +309,11 @@
 
 /* Mini Cart Styles - Icon Only Version (no tooltips) */
 .gpb-mini-cart-progress {
-    padding: 15px;
+    padding: 10px 12px 52px;
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     margin-bottom: 15px;
-    padding-bottom: 70px; /* Extra breathing room so the icons never trigger scroll */
     box-sizing: border-box; /* Prevent horizontal overflow in slide-in carts */
     width: 100%; /* Ensure progress bar respects drawer width */
 }
@@ -341,7 +340,7 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 .gpb-mini-message {
     font-size: 13px;
     line-height: 1.4;
-    margin-bottom: 18px; /* Increased for better spacing */
+    margin-bottom: 10px; /* Compact spacing keeps bar and milestones within view */
     text-align: center;
 }
 
@@ -357,7 +356,7 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Progress Bar */
 .gpb-mini-progress-outer {
     position: relative;
-    margin: 0 15px 26px 15px; /* Keep a generous gap before the milestones */
+    margin: 0 12px 16px 12px; /* Tightened vertical spacing for mini cart drawers */
 }
 
 .gpb-mini-progress-bg {
@@ -393,10 +392,10 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Milestones */
 .gpb-mini-milestones {
     position: relative !important;
-    min-height: 64px !important; /* Taller canvas keeps everything in view */
+    min-height: 52px !important; /* Enough canvas for icons without forcing scroll */
     margin-top: 0 !important; /* Space handled by padding for consistent offset */
     display: block !important;
-    padding-top: 32px !important; /* Push milestones clearly below the bar */
+    padding-top: 22px !important; /* Keeps icons under the bar while staying compact */
 }
 
 .gpb-mini-milestone {
