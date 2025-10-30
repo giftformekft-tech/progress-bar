@@ -315,6 +315,8 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     margin-bottom: 15px;
     padding-bottom: 55px; /* Adequate space for milestone icons */
+    box-sizing: border-box; /* Prevent horizontal overflow in slide-in carts */
+    width: 100%; /* Ensure progress bar respects drawer width */
 }
 
 /* ULTIMATE duplicate prevention - hide ALL except first */
@@ -391,8 +393,8 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Milestones */
 .gpb-mini-milestones {
     position: relative !important;
-    min-height: 35px !important; /* Reduced from 40px */
-    margin-top: 12px !important; /* Increased for proper spacing below progress bar */
+    min-height: 42px !important; /* Extra space so icons never overlap message */
+    margin-top: 16px !important; /* Additional gap between bar and milestones */
     display: block !important;
     padding-top: 0px !important; /* No extra padding needed */
 }
