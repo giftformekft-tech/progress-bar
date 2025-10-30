@@ -314,7 +314,9 @@
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     margin-bottom: 15px;
-    padding-bottom: 55px; /* Adequate space for milestone icons */
+    padding-bottom: 70px; /* Extra breathing room so the icons never trigger scroll */
+    box-sizing: border-box; /* Prevent horizontal overflow in slide-in carts */
+    width: 100%; /* Ensure progress bar respects drawer width */
 }
 
 /* ULTIMATE duplicate prevention - hide ALL except first */
@@ -355,7 +357,7 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Progress Bar */
 .gpb-mini-progress-outer {
     position: relative;
-    margin: 0 15px 10px 15px; /* Increased bottom margin for icon spacing */
+    margin: 0 15px 26px 15px; /* Keep a generous gap before the milestones */
 }
 
 .gpb-mini-progress-bg {
@@ -391,10 +393,10 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Milestones */
 .gpb-mini-milestones {
     position: relative !important;
-    min-height: 35px !important; /* Reduced from 40px */
-    margin-top: 12px !important; /* Increased for proper spacing below progress bar */
+    min-height: 64px !important; /* Taller canvas keeps everything in view */
+    margin-top: 0 !important; /* Space handled by padding for consistent offset */
     display: block !important;
-    padding-top: 0px !important; /* No extra padding needed */
+    padding-top: 32px !important; /* Push milestones clearly below the bar */
 }
 
 .gpb-mini-milestone {
@@ -402,7 +404,7 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
     display: block !important;
     transform: translateX(-50%) !important;
     z-index: 10 !important;
-    /* top removed - using inline style instead */
+    /* Vertical offset handled by .gpb-mini-milestones padding */
 }
 
 /* Force override any theme styles */

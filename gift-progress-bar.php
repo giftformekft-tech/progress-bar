@@ -3,7 +3,7 @@
  * Plugin Name: Gift Progress Bar for WooCommerce
  * Plugin URI: https://github.com/yourusername/gift-progress-bar
  * Description: Vizuális progress bar a kosárban, ami ösztönzi a vásárlókat a kosárérték növelésére küszöbértékek és ajándékok megjelenítésével.
- * Version: 1.0.7-production
+ * Version: 1.0.8-production
  * Author: Your Name
  * Author URI: https://yourwebsite.com
  * License: GPL v2 or later
@@ -30,7 +30,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('GPB_VERSION', '1.0.7-production');
+define('GPB_VERSION', '1.0.8-production');
 define('GPB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GPB_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('GPB_PLUGIN_BASENAME', plugin_basename(__FILE__));
