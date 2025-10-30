@@ -1,0 +1,617 @@
+/* Gift Progress Bar - Frontend Styles */
+
+.gpb-progress-bar-wrapper {
+    margin: 0 0 30px 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Hide duplicate progress bars - only show the first one */
+.gpb-progress-bar-wrapper ~ .gpb-progress-bar-wrapper {
+    display: none !important;
+}
+
+.gpb-progress-bar-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    position: relative;
+}
+
+/* Message */
+.gpb-message {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-align: center;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.gpb-message-icon {
+    font-size: 20px;
+    margin-right: 8px;
+}
+
+.gpb-message strong {
+    font-weight: 600;
+}
+
+/* Progress Bar */
+.gpb-progress-bar-outer {
+    position: relative;
+    margin: 0 20px 40px 20px;
+}
+
+.gpb-progress-bar-bg {
+    height: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.gpb-progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    position: relative;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.gpb-progress-bar-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    50%, 100% {
+        left: 100%;
+    }
+}
+
+/* Milestones */
+.gpb-milestones {
+    position: relative;
+    height: 0;
+    margin-top: -8px;
+}
+
+.gpb-milestone {
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.gpb-milestone-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gpb-milestone-icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #999999;
+}
+
+.gpb-milestone.completed .gpb-milestone-icon {
+    border-width: 3px;
+    animation: bounceIn 0.6s ease-out;
+}
+
+.gpb-milestone.completed .gpb-milestone-icon .dashicons {
+    color: #ffffff;
+}
+
+.gpb-milestone.active .gpb-milestone-icon {
+    border-width: 3px;
+    animation: pulse 2s infinite;
+}
+
+.gpb-milestone.active .gpb-milestone-icon .dashicons {
+    color: inherit;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Tooltip */
+.gpb-milestone-tooltip {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333333;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gpb-milestone-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: #333333;
+}
+
+.gpb-milestone:hover .gpb-milestone-tooltip {
+    opacity: 1;
+    visibility: visible;
+    bottom: 55px;
+}
+
+.gpb-milestone-amount {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.gpb-milestone-reward {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .gpb-progress-bar-container {
+        padding: 20px 16px;
+    }
+    
+    .gpb-message {
+        font-size: 14px;
+    }
+    
+    .gpb-progress-bar-outer {
+        margin: 0 10px 35px 10px;
+    }
+    
+    .gpb-progress-bar-bg {
+        height: 12px;
+    }
+    
+    .gpb-milestone-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .gpb-milestone-icon .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+    
+    .gpb-milestone-tooltip {
+        padding: 10px 12px;
+        font-size: 12px;
+        max-width: 200px;
+        white-space: normal;
+    }
+    
+    .gpb-milestone-amount {
+        font-size: 13px;
+    }
+    
+    .gpb-milestone-reward {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gpb-progress-bar-container {
+        padding: 16px 12px;
+    }
+    
+    .gpb-message {
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+    
+    .gpb-message-icon {
+        font-size: 16px;
+    }
+    
+    .gpb-progress-bar-outer {
+        margin: 0 5px 30px 5px;
+    }
+    
+    .gpb-progress-bar-bg {
+        height: 10px;
+    }
+    
+    .gpb-milestone-icon {
+        width: 28px;
+        height: 28px;
+        border-width: 2px;
+    }
+    
+    .gpb-milestone.completed .gpb-milestone-icon,
+    .gpb-milestone.active .gpb-milestone-icon {
+        border-width: 2px;
+    }
+    
+    .gpb-milestone-icon .dashicons {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .gpb-progress-bar-wrapper {
+        display: none;
+    }
+}
+
+/* Mini Cart Styles - Icon Only Version (no tooltips) */
+.gpb-mini-cart-progress {
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 15px;
+    padding-bottom: 55px; /* Adequate space for milestone icons */
+}
+
+/* ULTIMATE duplicate prevention - hide ALL except first */
+body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
+.woocommerce-mini-cart .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
+.widget_shopping_cart .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
+#woocommerce_widget_cart .gpb-mini-cart-progress ~ .gpb-mini-cart-progress {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+.gpb-mini-cart-container {
+    position: relative;
+}
+
+/* Mini Cart Message */
+.gpb-mini-message {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 18px; /* Increased for better spacing */
+    text-align: center;
+}
+
+.gpb-mini-message-icon {
+    font-size: 16px;
+    margin-right: 6px;
+}
+
+.gpb-mini-message strong {
+    font-weight: 600;
+}
+
+/* Mini Cart Progress Bar */
+.gpb-mini-progress-outer {
+    position: relative;
+    margin: 0 15px 10px 15px; /* Increased bottom margin for icon spacing */
+}
+
+.gpb-mini-progress-bg {
+    height: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.gpb-mini-progress-fill {
+    height: 100%;
+    border-radius: 8px;
+    position: relative;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.gpb-mini-progress-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shine 2s infinite;
+}
+
+/* Mini Cart Milestones */
+.gpb-mini-milestones {
+    position: relative !important;
+    min-height: 35px !important; /* Reduced from 40px */
+    margin-top: 12px !important; /* Increased for proper spacing below progress bar */
+    display: block !important;
+    padding-top: 0px !important; /* No extra padding needed */
+}
+
+.gpb-mini-milestone {
+    position: absolute !important;
+    display: block !important;
+    transform: translateX(-50%) !important;
+    z-index: 10 !important;
+    /* top removed - using inline style instead */
+}
+
+/* Force override any theme styles */
+.gpb-mini-cart-progress .gpb-mini-milestone,
+.widget_shopping_cart .gpb-mini-milestone,
+.astra-cart-drawer-content .gpb-mini-milestone,
+body .gpb-mini-milestone {
+    position: absolute !important;
+    display: block !important;
+}
+
+.gpb-mini-milestone-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.gpb-mini-milestone-icon .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #999999;
+}
+
+.gpb-mini-milestone.completed .gpb-mini-milestone-icon {
+    border-width: 2px;
+    animation: bounceIn 0.6s ease-out;
+}
+
+.gpb-mini-milestone.completed .gpb-mini-milestone-icon .dashicons {
+    color: #ffffff;
+}
+
+.gpb-mini-milestone.active .gpb-mini-milestone-icon {
+    border-width: 2px;
+    animation: pulse 2s infinite;
+}
+
+.gpb-mini-milestone.active .gpb-mini-milestone-icon .dashicons {
+    color: inherit;
+}
+
+/* Mini Cart Tooltip - REMOVED (icon only version) */
+.gpb-mini-milestone-tooltip {
+    display: none !important; /* Completely hidden */
+}
+
+.gpb-mini-milestone-amount {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.gpb-mini-milestone-reward {
+    font-size: 11px;
+    opacity: 0.9;
+}
+
+/* Hide old list styles if they exist */
+.gpb-mini-milestones-list {
+    display: none !important;
+}
+
+.gpb-mini-progress-text {
+    display: none !important;
+}
+
+/* WooCommerce Mini Cart Widget Specific */
+.widget_shopping_cart .gpb-mini-cart-progress {
+    margin: 0 0 20px 0;
+    padding: 12px;
+}
+
+.woocommerce-mini-cart__buttons + .gpb-mini-cart-progress,
+.gpb-mini-cart-progress + .woocommerce-mini-cart__buttons {
+    margin-top: 15px;
+}
+
+/* Compact Mode for Very Small Widgets */
+@media (max-width: 320px) {
+    .gpb-mini-cart-progress {
+        padding: 10px;
+    }
+    
+    .gpb-mini-message {
+        font-size: 12px;
+    }
+    
+    .gpb-mini-icon {
+        font-size: 16px;
+    }
+    
+    .gpb-mini-milestone {
+        font-size: 11px;
+        padding: 5px 6px;
+    }
+    
+    .gpb-mini-milestone-text small {
+        font-size: 9px;
+    }
+}
+
+/* Accessibility */
+.gpb-mini-milestone:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+/* Loading state */
+.gpb-mini-cart-progress.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Success animation for mini cart */
+.gpb-mini-cart-progress.updated .gpb-mini-progress-fill {
+    animation: miniPulse 0.6s ease-out;
+}
+
+@keyframes miniPulse {
+    0%, 100% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.5);
+    }
+}
+
+/* Accessibility */
+.gpb-milestone:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+.gpb-milestone:focus .gpb-milestone-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Loading state */
+.gpb-progress-bar-wrapper.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Success animation */
+.gpb-progress-bar-wrapper.success .gpb-progress-bar-fill {
+    animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+    0%, 100% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.2);
+    }
+}
+
+/* ===================================
+   MOBILE RESPONSIVE FIXES
+   =================================== */
+
+/* Mobile phones */
+@media (max-width: 768px) {
+    /* More space between message and progress bar */
+    .gpb-mini-message {
+        margin-bottom: 20px !important;
+    }
+    
+    /* Proper spacing on mobile */
+    .gpb-mini-progress-outer {
+        margin-bottom: 10px !important; /* Adequate space for icons */
+    }
+    
+    /* Proper space for milestones on mobile */
+    .gpb-mini-milestones {
+        margin-top: 12px !important; /* Consistent with desktop */
+        min-height: 32px !important; /* Smaller on mobile */
+    }
+    
+    /* Smaller icons on small screens */
+    .gpb-mini-milestone-icon {
+        width: 24px !important;
+        height: 24px !important;
+    }
+    
+    .gpb-mini-milestone-icon .dashicons {
+        font-size: 12px !important;
+        width: 12px !important;
+        height: 12px !important;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+    .gpb-mini-milestones {
+        margin-top: 12px !important; /* Consistent spacing */
+    }
+    
+    .gpb-mini-progress-outer {
+        margin-bottom: 10px !important; /* Consistent spacing */
+    }
+}

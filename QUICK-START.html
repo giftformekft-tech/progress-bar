@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Progress Bar - Gyors Telepítési Útmutató</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .step {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-right: 15px;
+        }
+        
+        .step h2 {
+            display: inline-block;
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .step-content {
+            margin-left: 55px;
+            margin-top: 15px;
+        }
+        
+        .step ul {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .step li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .step li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .feature h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            color: #1565c0;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            color: #2e7d32;
+        }
+        
+        .alert-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #e65100;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        footer {
+            background: #f9f9f9;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .step-content {
+                margin-left: 0;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎁 Gift Progress Bar</h1>
+            <p>WordPress WooCommerce Plugin - Gyors Telepítési Útmutató</p>
+        </header>
+        
+        <div class="content">
+            <div class="alert alert-success">
+                <strong>Köszönjük, hogy ezt a plugint választottad!</strong> Ez az útmutató 5 perc alatt működőképessé teszi a progress bar-t a webshopodban.
+            </div>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <h2>Telepítés</h2>
+                <div class="step-content">
+                    <p><strong>WordPress Admin felületről:</strong></p>
+                    <ul>
+                        <li>Menj a <strong>Bővítmények → Új hozzáadása</strong> menüpontra</li>
+                        <li>Kattints a <strong>Bővítmény feltöltése</strong> gombra</li>
+                        <li>Válaszd ki a <code>gift-progress-bar.zip</code> fájlt</li>
+                        <li>Kattints a <strong>Telepítés most</strong> gombra</li>
+                        <li>Aktiváld a plugint</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <strong>Fontos:</strong> A plugin működéséhez szükséges a WooCommerce plugin. Ha nincs telepítve, a plugin automatikusan jelzi.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <h2>Beállítások</h2>
+                <div class="step-content">
+                    <p>Menj a <strong>WooCommerce → Ajándék Progress Bar</strong> menüpontra</p>
+                    
+                    <h3 style="margin-top: 20px; color: #4CAF50;">Alapértelmezett küszöbértékek:</h3>
+                    <div class="code-block">
+15 000 Ft → Ingyenes szállítás
+15 990 Ft → Ajándék Filmes póló
+19 990 Ft → Ajándék Filmes póló és bögre
+24 990 Ft → Ajándék 2 db Filmes póló
+                    </div>
+                    
+                    <p>Ezek azonnal működnek, de természetesen testreszabhatod őket!</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <h2>Testreszabás</h2>
+                <div class="step-content">
+                    <h3 style="color: #4CAF50;">Színek módosítása:</h3>
+                    <ul>
+                        <li><strong>Progress bar színe</strong> - Az aktív kitöltés színe</li>
+                        <li><strong>Háttér színe</strong> - A progress bar háttere</li>
+                        <li><strong>Szöveg színe</strong> - Az üzenetek színe</li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 20px; color: #4CAF50;">Küszöbértékek szerkesztése:</h3>
+                    <ul>
+                        <li>Módosítsd az <strong>Összeg</strong>et (Ft-ban)</li>
+                        <li>Írj be egyedi <strong>Jutalom leírás</strong>t</li>
+                        <li>Válassz <strong>Dashicon</strong> ikont</li>
+                        <li>Húzd az elemeket a kívánt sorrendbe</li>
+                        <li>Kattints a <strong>Beállítások mentése</strong> gombra</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4</span>
+                <h2>Tesztelés</h2>
+                <div class="step-content">
+                    <ul>
+                        <li>Látogasd meg a webshop főoldalát</li>
+                        <li>Adj hozzá egy terméket a kosárhoz</li>
+                        <li>Nézd meg a kosár oldalt</li>
+                        <li>Ellenőrizd a progress bar megjelenését</li>
+                        <li>Adj hozzá további termékeket</li>
+                        <li>Figyeld a bar dinamikus frissülését</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h2 style="text-align: center; margin: 40px 0 20px; font-size: 2em;">✨ Főbb Funkciók</h2>
+            
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Vizuális Progress Bar</h3>
+                    <p>Szép, modern megjelenés animációkkal</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Valós idejű frissítés</h3>
+                    <p>AJAX-on keresztül automatikus</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Testreszabható</h3>
+                    <p>Színek, szövegek, ikonok</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <h3>Reszponzív</h3>
+                    <p>Tökéletes minden eszközön</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Gyors betöltés</h3>
+                    <p>Optimalizált kód</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Könnyű kezelés</h3>
+                    <p>Intuitív admin felület</p>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>Tipp:</strong> Kezdj alacsony küszöbértékekkel, hogy a legtöbb vásárló lásson eredményt. Ne használj túl sok szintet (max 5-6 ajánlott).
+            </div>
+            
+            <h2 style="margin: 40px 0 20px;">📖 További Dokumentáció</h2>
+            
+            <ul style="font-size: 1.1em; line-height: 2;">
+                <li><strong>README.md</strong> - Részletes funkciók és használat</li>
+                <li><strong>INSTALLATION.md</strong> - Teljes telepítési útmutató</li>
+                <li><strong>VISUAL-GUIDE.md</strong> - Dizájn és megjelenési útmutató</li>
+                <li><strong>CHANGELOG.md</strong> - Verzió történet</li>
+            </ul>
+            
+            <div class="alert alert-success" style="margin-top: 40px;">
+                <strong>🎉 Gratulálunk!</strong> A Gift Progress Bar plugin telepítése sikeres. Most már növelheted a kosárérték átlagát a webshopodban!
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Gift Progress Bar for WooCommerce</strong></p>
+            <p>Version 1.0.0 | GPL v2 License</p>
+            <p style="margin-top: 10px; color: #666;">Ha segítségre van szükséged, nézd meg a részletes dokumentációt!</p>
+        </footer>
+    </div>
+</body>
+</html>
