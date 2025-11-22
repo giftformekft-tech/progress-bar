@@ -356,7 +356,7 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Progress Bar */
 .gpb-mini-progress-outer {
     position: relative;
-    margin: 0 12px 16px 12px; /* Tightened vertical spacing for mini cart drawers */
+    margin: 0 12px 10px 12px; /* Tightened vertical spacing for mini cart drawers */
 }
 
 .gpb-mini-progress-bg {
@@ -392,10 +392,10 @@ body .gpb-mini-cart-progress ~ .gpb-mini-cart-progress,
 /* Mini Cart Milestones */
 .gpb-mini-milestones {
     position: relative !important;
-    min-height: 52px !important; /* Enough canvas for icons without forcing scroll */
+    min-height: 44px !important; /* Enough canvas for icons without forcing scroll */
     margin-top: 0 !important; /* Space handled by padding for consistent offset */
     display: block !important;
-    padding-top: 22px !important; /* Keeps icons under the bar while staying compact */
+    padding-top: 12px !important; /* Keeps icons under the bar while staying compact */
 }
 
 .gpb-mini-milestone {
@@ -584,7 +584,7 @@ body .gpb-mini-milestone {
     
     /* Proper spacing on mobile */
     .gpb-mini-progress-outer {
-        margin-bottom: 10px !important; /* Adequate space for icons */
+        margin-bottom: 8px !important; /* Adequate space for icons */
     }
     
     /* Proper space for milestones on mobile */
@@ -613,6 +613,6 @@ body .gpb-mini-milestone {
     }
     
     .gpb-mini-progress-outer {
-        margin-bottom: 10px !important; /* Consistent spacing */
+        margin-bottom: 8px !important; /* Consistent spacing */
     }
 }
