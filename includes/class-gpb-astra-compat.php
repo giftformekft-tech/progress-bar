@@ -50,6 +50,9 @@ class GPB_Astra_Compat {
         // JavaScript DOM injection (ha a hookok nem működnek)
         add_action('wp_footer', array($this, 'add_dom_injection_script'), 100);
         
+        // Astra Cart Title override
+        add_action('wp_footer', array($this, 'add_cart_title_override'), 100);
+        
         // Admin értesítés
         add_action('admin_notices', array($this, 'astra_integration_notice'));
         
@@ -544,6 +547,56 @@ class GPB_Astra_Compat {
                 </small>
             </p>
         </div>
+        <?php
+    }
+
+    /**
+     * Astra Cart Title override
+     * Changes "Shopping Cart" to "Kosár"
+     */
+    public function add_cart_title_override() {
+        if (is_admin()) return;
+        ?>
+        <script type="text/javascript">
+        (function($) {
+            function changeCartTitle() {
+                $('.astra-cart-drawer-title').each(function() {
+                    var el = $(this);
+                    // Csak akkor írjuk felül, ha nem "Kosár" (hogy ne villogjon feleslegesen, bár a text() gyors)
+                    if (el.text().trim() !== 'Kosár') {
+                        el.text('Kosár');
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                // Azonnali futtatás
+                changeCartTitle();
+                setTimeout(changeCartTitle, 500); // Késleltetve is, biztos ami biztos
+
+                // WooCommerce eseményekre
+                $(document.body).on('wc_fragments_refreshed wc_fragments_loaded added_to_cart', function() {
+                    setTimeout(changeCartTitle, 100);
+                });
+                
+                // MutationObserver a dinamikus változásokhoz (pl. Astra side cart megnyitása)
+                var observer = new MutationObserver(function(mutations) {
+                     var shouldUpdate = false;
+                     mutations.forEach(function(mutation) {
+                        if (mutation.addedNodes.length || mutation.type === 'attributes') {
+                            shouldUpdate = true;
+                        }
+                     });
+                     if (shouldUpdate) {
+                        changeCartTitle();
+                     }
+                });
+                
+                // Figyeljük a body-t, mert az Astra side cart oda kerülhet be
+                observer.observe(document.body, { childList: true, subtree: true });
+            });
+        })(jQuery);
+        </script>
         <?php
     }
 }
