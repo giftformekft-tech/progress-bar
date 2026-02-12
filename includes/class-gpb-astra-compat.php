@@ -50,8 +50,8 @@ class GPB_Astra_Compat {
         // JavaScript DOM injection (ha a hookok nem működnek)
         add_action('wp_footer', array($this, 'add_dom_injection_script'), 100);
         
-        // Astra Cart Title override
-        add_action('wp_footer', array($this, 'add_cart_title_override'), 100);
+        // Astra Cart Text overrides
+        add_action('wp_footer', array($this, 'add_cart_text_overrides'), 100);
         
         // Admin értesítés
         add_action('admin_notices', array($this, 'astra_integration_notice'));
@@ -361,6 +361,7 @@ class GPB_Astra_Compat {
             width: 14px !important;
             height: 14px !important;
             line-height: 30px !important;
+            
         }
         
         /* Tooltip kisebb */
@@ -551,32 +552,42 @@ class GPB_Astra_Compat {
     }
 
     /**
-     * Astra Cart Title override
-     * Changes "Shopping Cart" to "Kosár"
+     * Astra Cart Text overrides
+     * 
+     * 1. Changes "Shopping Cart" to "Kosár"
+     * 2. Changes "Continue Shopping" to "Vásárlás folytatása"
      */
-    public function add_cart_title_override() {
+    public function add_cart_text_overrides() {
         if (is_admin()) return;
         ?>
         <script type="text/javascript">
         (function($) {
-            function changeCartTitle() {
+            function changeCartTexts() {
+                // 1. Kosár cím
                 $('.astra-cart-drawer-title').each(function() {
                     var el = $(this);
-                    // Csak akkor írjuk felül, ha nem "Kosár" (hogy ne villogjon feleslegesen, bár a text() gyors)
                     if (el.text().trim() !== 'Kosár') {
                         el.text('Kosár');
+                    }
+                });
+                
+                // 2. Vásárlás folytatása gomb
+                $('.ast-continue-shopping').each(function() {
+                    var el = $(this);
+                    if (el.text().trim() !== 'Vásárlás folytatása') {
+                        el.text('Vásárlás folytatása');
                     }
                 });
             }
 
             $(document).ready(function() {
                 // Azonnali futtatás
-                changeCartTitle();
-                setTimeout(changeCartTitle, 500); // Késleltetve is, biztos ami biztos
+                changeCartTexts();
+                setTimeout(changeCartTexts, 500); // Késleltetve is, biztos ami biztos
 
                 // WooCommerce eseményekre
                 $(document.body).on('wc_fragments_refreshed wc_fragments_loaded added_to_cart', function() {
-                    setTimeout(changeCartTitle, 100);
+                    setTimeout(changeCartTexts, 100);
                 });
                 
                 // MutationObserver a dinamikus változásokhoz (pl. Astra side cart megnyitása)
@@ -588,7 +599,7 @@ class GPB_Astra_Compat {
                         }
                      });
                      if (shouldUpdate) {
-                        changeCartTitle();
+                        changeCartTexts();
                      }
                 });
                 
@@ -599,6 +610,7 @@ class GPB_Astra_Compat {
         </script>
         <?php
     }
+
 }
 
 // Inicializálás
