@@ -556,6 +556,7 @@ class GPB_Astra_Compat {
      * 
      * 1. Changes "Shopping Cart" to "Kosár"
      * 2. Changes "Continue Shopping" to "Vásárlás folytatása"
+     * 3. Changes "No products in the cart." to "A kosarad üres."
      */
     public function add_cart_text_overrides() {
         if (is_admin()) return;
@@ -576,6 +577,15 @@ class GPB_Astra_Compat {
                     var el = $(this);
                     if (el.text().trim() !== 'Vásárlás folytatása') {
                         el.text('Vásárlás folytatása');
+                    }
+                });
+                
+                // 3. Üres kosár üzenet
+                $('.woocommerce-mini-cart__empty-message').each(function() {
+                    var el = $(this);
+                    // Csak ha nem magyar (bár a trim miatt lehet, hogy változik)
+                    if (el.text().trim() !== 'A kosarad üres.') {
+                        el.text('A kosarad üres.');
                     }
                 });
             }
