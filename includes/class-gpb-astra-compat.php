@@ -72,6 +72,11 @@ class GPB_Astra_Compat {
         if (!function_exists('WC') || !WC()->cart || WC()->cart->is_empty()) {
             return;
         }
+
+        // Ellenőrizzük, hogy a mini cart engedélyezve van-e
+        if (get_option('gpb_enable_mini_cart', 'yes') !== 'yes') {
+            return;
+        }
         
         // Progress data lekérése
         $progress_data = Gift_Progress_Bar::calculate_progress();

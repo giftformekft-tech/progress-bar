@@ -431,7 +431,9 @@ class GPB_Frontend {
         ob_start();
         
         $progress_data = Gift_Progress_Bar::calculate_progress();
-        if ($progress_data) {
+        
+        // Only generate if cart display is enabled
+        if ($progress_data && get_option('gpb_enable_cart', 'yes') === 'yes') {
             $this->render_progress_bar($progress_data);
         }
         
@@ -440,7 +442,8 @@ class GPB_Frontend {
         // Mini cart progress bar fragment
         ob_start();
         
-        if ($progress_data) {
+        // Only generate if mini cart display is enabled
+        if ($progress_data && get_option('gpb_enable_mini_cart', 'yes') === 'yes') {
             $this->render_mini_cart_progress($progress_data);
         }
         
