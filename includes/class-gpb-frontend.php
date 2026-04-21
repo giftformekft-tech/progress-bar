@@ -232,7 +232,12 @@ class GPB_Frontend {
                         <?php
                         $is_completed = in_array($index, $data['completed_levels']);
                         $is_active = (!$is_completed && $data['next_level'] && $threshold['amount'] === $data['next_level']['amount']);
-                        $position = ($threshold['amount'] / $data['highest_threshold']) * 100;
+                        // Use manual bar_position if set, otherwise auto-calculate
+                        if (isset($threshold['bar_position']) && $threshold['bar_position'] !== '' && $threshold['bar_position'] !== null) {
+                            $position = floatval($threshold['bar_position']);
+                        } else {
+                            $position = ($threshold['amount'] / $data['highest_threshold']) * 100;
+                        }
                         
                         $classes = array('gpb-milestone');
                         if ($is_completed) {
@@ -319,7 +324,12 @@ class GPB_Frontend {
                         <?php
                         $is_completed = in_array($index, $data['completed_levels']);
                         $is_active = (!$is_completed && $data['next_level'] && $threshold['amount'] === $data['next_level']['amount']);
-                        $position = ($threshold['amount'] / $data['highest_threshold']) * 100;
+                        // Use manual bar_position if set, otherwise auto-calculate
+                        if (isset($threshold['bar_position']) && $threshold['bar_position'] !== '' && $threshold['bar_position'] !== null) {
+                            $position = floatval($threshold['bar_position']);
+                        } else {
+                            $position = ($threshold['amount'] / $data['highest_threshold']) * 100;
+                        }
                         
                         $classes = array('gpb-mini-milestone');
                         if ($is_completed) {

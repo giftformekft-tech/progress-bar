@@ -220,6 +220,14 @@ class GPB_Admin {
                                                    placeholder="dashicons-cart">
                                             <span class="dashicons <?php echo esc_attr($threshold['icon']); ?> gpb-icon-preview"></span>
                                         </div>
+
+                                        <div class="gpb-field gpb-field-narrow">
+                                            <label><?php esc_html_e('Pozíció a báron (%)', 'gift-progress-bar'); ?></label>
+                                            <input type="number" name="gpb_thresholds[<?php echo esc_attr($index); ?>][bar_position]" 
+                                                   value="<?php echo isset($threshold['bar_position']) && $threshold['bar_position'] !== '' ? esc_attr($threshold['bar_position']) : ''; ?>" 
+                                                   min="0" max="100" step="1" placeholder="Auto">
+                                            <p class="description"><?php esc_html_e('Hagyd üresen az automatikus számításhoz.', 'gift-progress-bar'); ?></p>
+                                        </div>
                                     </div>
                                     
                                     <button type="button" class="gpb-remove-threshold button" title="<?php esc_attr_e('Törlés', 'gift-progress-bar'); ?>">
@@ -254,11 +262,15 @@ class GPB_Admin {
             foreach ($_POST['gpb_thresholds'] as $threshold) {
                 if (!empty($threshold['amount']) && !empty($threshold['reward'])) {
                     $type = (isset($threshold['type']) && $threshold['type'] === 'quantity') ? 'quantity' : 'amount';
+                    $bar_position = (isset($threshold['bar_position']) && $threshold['bar_position'] !== '') 
+                                    ? min(100, max(0, floatval($threshold['bar_position']))) 
+                                    : '';
                     $thresholds[] = array(
-                        'type'   => $type,
-                        'amount' => ($type === 'quantity') ? intval($threshold['amount']) : floatval($threshold['amount']),
-                        'reward' => sanitize_text_field($threshold['reward']),
-                        'icon'   => sanitize_text_field($threshold['icon'])
+                        'type'         => $type,
+                        'amount'       => ($type === 'quantity') ? intval($threshold['amount']) : floatval($threshold['amount']),
+                        'reward'       => sanitize_text_field($threshold['reward']),
+                        'icon'         => sanitize_text_field($threshold['icon']),
+                        'bar_position' => $bar_position
                     );
                 }
             }

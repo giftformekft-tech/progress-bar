@@ -149,6 +149,13 @@
                                    value="dashicons-cart" placeholder="dashicons-cart">
                             <span class="dashicons dashicons-cart gpb-icon-preview"></span>
                         </div>
+
+                        <div class="gpb-field gpb-field-narrow">
+                            <label>Pozíció a báron (%)</label>
+                            <input type="number" name="gpb_thresholds[${index}][bar_position]" 
+                                   value="" min="0" max="100" step="1" placeholder="Auto">
+                            <p class="description">Hagyd üresen az automatikus számításhoz.</p>
+                        </div>
                     </div>
                     
                     <button type="button" class="gpb-remove-threshold button" title="Törlés">
