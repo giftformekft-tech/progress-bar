@@ -256,13 +256,20 @@ class GPB_Frontend {
                             </div>
                             
                             <div class="gpb-milestone-tooltip">
-                                <div class="gpb-milestone-amount">
-                                    <?php echo wc_price($threshold['amount']); ?>
+                                    <div class="gpb-milestone-amount">
+                                        <?php
+                                        $ms_type = isset($threshold['type']) ? $threshold['type'] : 'amount';
+                                        if ($ms_type === 'quantity') {
+                                            echo esc_html(intval($threshold['amount']) . ' db');
+                                        } else {
+                                            echo wc_price($threshold['amount']);
+                                        }
+                                        ?>
+                                    </div>
+                                    <div class="gpb-milestone-reward">
+                                        <?php echo esc_html($threshold['reward']); ?>
+                                    </div>
                                 </div>
-                                <div class="gpb-milestone-reward">
-                                    <?php echo esc_html($threshold['reward']); ?>
-                                </div>
-                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -387,6 +394,15 @@ class GPB_Frontend {
                    '</strong>';
         }
         
+        // Helper: format a threshold value for display
+        $format_needed = function($level, $amount_needed) {
+            $type = isset($level['type']) ? $level['type'] : 'amount';
+            if ($type === 'quantity') {
+                return '<strong>' . intval($amount_needed) . ' db</strong>';
+            }
+            return '<strong>' . wc_price($amount_needed) . '</strong>';
+        };
+        
         if ($data['current_level']) {
             $message = '<span class="gpb-message-icon">🎉</span> <strong>' . 
                       esc_html__('Gratulálunk!', 'gift-progress-bar') . 
@@ -399,7 +415,7 @@ class GPB_Frontend {
             if ($data['next_level']) {
                 $message .= ' ' . sprintf(
                     esc_html__('Már csak %s kell a következő ajándékhoz: %s', 'gift-progress-bar'),
-                    '<strong>' . wc_price($data['amount_needed']) . '</strong>',
+                    $format_needed($data['next_level'], $data['amount_needed']),
                     '<strong>' . esc_html($data['next_level']['reward']) . '</strong>'
                 );
             }
@@ -410,7 +426,7 @@ class GPB_Frontend {
         if ($data['next_level']) {
             return sprintf(
                 esc_html__('Már csak %s kell az ajándékhoz: %s', 'gift-progress-bar'),
-                '<strong>' . wc_price($data['amount_needed']) . '</strong>',
+                $format_needed($data['next_level'], $data['amount_needed']),
                 '<strong>' . esc_html($data['next_level']['reward']) . '</strong>'
             );
         }

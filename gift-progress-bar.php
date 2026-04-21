@@ -119,27 +119,39 @@ class Gift_Progress_Bar {
         if (empty($thresholds)) {
             $thresholds = array(
                 array(
+                    'type'   => 'amount',
                     'amount' => 15000,
                     'reward' => 'Ingyenes szállítás',
-                    'icon' => 'dashicons-cart'
+                    'icon'   => 'dashicons-cart'
                 ),
                 array(
+                    'type'   => 'amount',
                     'amount' => 15990,
                     'reward' => 'Ajándék Filmes póló',
-                    'icon' => 'dashicons-products'
+                    'icon'   => 'dashicons-products'
                 ),
                 array(
+                    'type'   => 'amount',
                     'amount' => 19990,
                     'reward' => 'Ajándék Filmes póló és bögre',
-                    'icon' => 'dashicons-awards'
+                    'icon'   => 'dashicons-awards'
                 ),
                 array(
+                    'type'   => 'amount',
                     'amount' => 24990,
                     'reward' => 'Ajándék 2 db Filmes póló',
-                    'icon' => 'dashicons-star-filled'
+                    'icon'   => 'dashicons-star-filled'
                 )
             );
         }
+        
+        // Ensure legacy thresholds have a type
+        foreach ($thresholds as &$t) {
+            if (empty($t['type'])) {
+                $t['type'] = 'amount';
+            }
+        }
+        unset($t);
         
         // Sort by amount
         usort($thresholds, function($a, $b) {
@@ -157,23 +169,29 @@ class Gift_Progress_Bar {
             return null;
         }
         
-        $cart_total = floatval(WC()->cart->get_subtotal());
-        $thresholds = self::get_thresholds();
+        $cart_total    = floatval(WC()->cart->get_subtotal());
+        $cart_quantity = intval(WC()->cart->get_cart_contents_count());
+        $thresholds    = self::get_thresholds();
         
         if (empty($thresholds)) {
             return null;
         }
         
+        // Separate thresholds by type for progress calculation
+        // For a mixed bar we normalise everything to a single 0-100 percentage:
+        // each threshold stores its own completion independently.
         $highest_threshold = end($thresholds)['amount'];
-        $current_level = null;
-        $next_level = null;
-        $completed_levels = array();
+        $current_level     = null;
+        $next_level        = null;
+        $completed_levels  = array();
         
-        // Find current and next levels
         foreach ($thresholds as $index => $threshold) {
-            if ($cart_total >= $threshold['amount']) {
+            $type          = isset($threshold['type']) ? $threshold['type'] : 'amount';
+            $current_value = ($type === 'quantity') ? $cart_quantity : $cart_total;
+            
+            if ($current_value >= $threshold['amount']) {
                 $completed_levels[] = $index;
-                $current_level = $threshold;
+                $current_level      = $threshold;
             } else {
                 if ($next_level === null) {
                     $next_level = $threshold;
@@ -181,28 +199,35 @@ class Gift_Progress_Bar {
             }
         }
         
-        // Calculate progress percentage
-        $progress_percent = min(100, ($cart_total / $highest_threshold) * 100);
+        // Progress percentage: use the next (or last) threshold as the target
+        $target_threshold = $next_level ? $next_level : end($thresholds);
+        $target_type      = isset($target_threshold['type']) ? $target_threshold['type'] : 'amount';
+        $target_value     = $target_threshold['amount'];
+        $current_value_for_percent = ($target_type === 'quantity') ? $cart_quantity : $cart_total;
+        $progress_percent = min(100, ($current_value_for_percent / $target_value) * 100);
         
-        // Calculate amount needed for next level
+        // Amount / quantity needed for next level
         $amount_needed = 0;
         if ($next_level) {
-            $amount_needed = $next_level['amount'] - $cart_total;
+            $next_type     = isset($next_level['type']) ? $next_level['type'] : 'amount';
+            $current_val   = ($next_type === 'quantity') ? $cart_quantity : $cart_total;
+            $amount_needed = $next_level['amount'] - $current_val;
         }
         
         // Check if all levels completed
         $all_completed = (count($completed_levels) === count($thresholds));
         
         return array(
-            'cart_total' => $cart_total,
+            'cart_total'       => $cart_total,
+            'cart_quantity'    => $cart_quantity,
             'progress_percent' => $progress_percent,
-            'current_level' => $current_level,
-            'next_level' => $next_level,
-            'amount_needed' => $amount_needed,
+            'current_level'    => $current_level,
+            'next_level'       => $next_level,
+            'amount_needed'    => $amount_needed,
             'completed_levels' => $completed_levels,
-            'all_completed' => $all_completed,
-            'thresholds' => $thresholds,
-            'highest_threshold' => $highest_threshold
+            'all_completed'    => $all_completed,
+            'thresholds'       => $thresholds,
+            'highest_threshold'=> $highest_threshold
         );
     }
 }

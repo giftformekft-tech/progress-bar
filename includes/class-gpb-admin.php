@@ -184,12 +184,23 @@ class GPB_Admin {
                         
                         <div id="gpb-thresholds-list" class="gpb-thresholds-list">
                             <?php foreach ($thresholds as $index => $threshold): ?>
+                                <?php $type = isset($threshold['type']) ? $threshold['type'] : 'amount'; ?>
                                 <div class="gpb-threshold-item" data-index="<?php echo esc_attr($index); ?>">
                                     <span class="gpb-drag-handle dashicons dashicons-move"></span>
                                     
                                     <div class="gpb-threshold-fields">
                                         <div class="gpb-field">
-                                            <label><?php esc_html_e('Összeg (Ft)', 'gift-progress-bar'); ?></label>
+                                            <label><?php esc_html_e('Típus', 'gift-progress-bar'); ?></label>
+                                            <select name="gpb_thresholds[<?php echo esc_attr($index); ?>][type]" class="gpb-threshold-type">
+                                                <option value="amount" <?php selected($type, 'amount'); ?>><?php esc_html_e('Összeghatár (Ft)', 'gift-progress-bar'); ?></option>
+                                                <option value="quantity" <?php selected($type, 'quantity'); ?>><?php esc_html_e('Darabszám (db)', 'gift-progress-bar'); ?></option>
+                                            </select>
+                                        </div>
+
+                                        <div class="gpb-field">
+                                            <label class="gpb-amount-label">
+                                                <?php echo ($type === 'quantity') ? esc_html__('Darabszám (db)', 'gift-progress-bar') : esc_html__('Összeg (Ft)', 'gift-progress-bar'); ?>
+                                            </label>
                                             <input type="number" name="gpb_thresholds[<?php echo esc_attr($index); ?>][amount]" 
                                                    value="<?php echo esc_attr($threshold['amount']); ?>" 
                                                    min="0" step="1" required>
@@ -242,10 +253,12 @@ class GPB_Admin {
         if (isset($_POST['gpb_thresholds']) && is_array($_POST['gpb_thresholds'])) {
             foreach ($_POST['gpb_thresholds'] as $threshold) {
                 if (!empty($threshold['amount']) && !empty($threshold['reward'])) {
+                    $type = (isset($threshold['type']) && $threshold['type'] === 'quantity') ? 'quantity' : 'amount';
                     $thresholds[] = array(
-                        'amount' => floatval($threshold['amount']),
+                        'type'   => $type,
+                        'amount' => ($type === 'quantity') ? intval($threshold['amount']) : floatval($threshold['amount']),
                         'reward' => sanitize_text_field($threshold['reward']),
-                        'icon' => sanitize_text_field($threshold['icon'])
+                        'icon'   => sanitize_text_field($threshold['icon'])
                     );
                 }
             }

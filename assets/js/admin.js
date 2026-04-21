@@ -69,6 +69,17 @@
             $(document).on('input', 'input[name*="[icon]"]', function() {
                 self.updateIconPreview($(this));
             });
+
+            // Update amount label when type changes
+            $(document).on('change', '.gpb-threshold-type', function() {
+                var $select = $(this);
+                var $label  = $select.closest('.gpb-threshold-item').find('.gpb-amount-label');
+                if ($select.val() === 'quantity') {
+                    $label.text('Darabszám (db)');
+                } else {
+                    $label.text('Összeg (Ft)');
+                }
+            });
         },
         
         /**
@@ -113,7 +124,15 @@
                     
                     <div class="gpb-threshold-fields">
                         <div class="gpb-field">
-                            <label>Összeg (Ft)</label>
+                            <label>Típus</label>
+                            <select name="gpb_thresholds[${index}][type]" class="gpb-threshold-type">
+                                <option value="amount">Összeghatár (Ft)</option>
+                                <option value="quantity">Darabszám (db)</option>
+                            </select>
+                        </div>
+
+                        <div class="gpb-field">
+                            <label class="gpb-amount-label">Összeg (Ft)</label>
                             <input type="number" name="gpb_thresholds[${index}][amount]" 
                                    value="" min="0" step="1" required>
                         </div>
@@ -145,7 +164,7 @@
         updateThresholdIndexes: function() {
             $('#gpb-thresholds-list .gpb-threshold-item').each(function(index) {
                 $(this).attr('data-index', index);
-                $(this).find('input').each(function() {
+                $(this).find('input, select').each(function() {
                     var name = $(this).attr('name');
                     if (name) {
                         var newName = name.replace(/\[\d+\]/, '[' + index + ']');
