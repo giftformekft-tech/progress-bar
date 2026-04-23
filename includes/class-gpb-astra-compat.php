@@ -114,25 +114,19 @@ class GPB_Astra_Compat {
             function injectProgressBar() {
                 if (injected) return;
 
-                // Strategy: inject BEFORE the sticky bottom section (subtotal + buttons)
-                // This keeps the bar in the fixed footer area — no scroll needed.
-                // Astra uses different class names depending on theme version.
-                var $footer = $(
-                    '.ast-side-cart-summary, ' +
-                    '.astra-cart-drawer-footer, ' +
-                    '.woocommerce-mini-cart__total'
-                ).first();
-
-                if ($footer.length && !$footer.prev('.gpb-injected').length) {
-                    $footer.before(progressBarHTML);
+                // If the PHP-rendered outer wrapper already has a progress bar,
+                // no JS injection is needed — just fix the layout and return.
+                var $outerBar = $('#gpb-astra-progress-bar');
+                if ($outerBar.length && $outerBar.find('.gpb-mini-cart-progress').length) {
                     injected = true;
-                    if (observer) observer.disconnect();
                     fixAstraLayout();
                     return;
                 }
 
-                // Fallback: prepend into the content area if footer not found
-                var $content = $('.astra-cart-drawer-content, .widget_shopping_cart_content').first();
+                // Fallback injection when the PHP hook didn't render the bar
+                // (e.g. first cart-open after AJAX add-to-cart on a page that
+                // was loaded before any product was in the cart).
+                var $content = $('.astra-cart-drawer-content').first();
                 if ($content.length && !$content.find('.gpb-injected').length) {
                     $content.prepend(progressBarHTML);
                     injected = true;
@@ -260,37 +254,49 @@ class GPB_Astra_Compat {
         if ($displayed) {
             return;
         }
-        
+
         // Csak akkor jelenjen meg, ha van termék a kosárban
         if (!function_exists('WC') || !WC()->cart || WC()->cart->is_empty()) {
             return;
         }
-        
+
         // Ellenőrizzük, hogy a mini cart engedélyezve van-e
         if (get_option('gpb_enable_mini_cart', 'yes') !== 'yes') {
             return;
         }
-        
+
         $displayed = true;
-        
+
+        // Always claim the global "mini cart displayed" slot so GPB_Frontend's
+        // woocommerce_before_mini_cart hook does not inject a second bar inside
+        // widget_shopping_cart_content (which would cause duplication).
+        global $gpb_mini_cart_displayed;
+        $gpb_mini_cart_displayed = true;
+
+        // During AJAX fragment refresh WooCommerce re-renders widget_shopping_cart_content.
+        // add_astra_fragments() handles the outer wrapper update via the #gpb-astra-progress-bar
+        // fragment — rendering here would place a bar *inside* the widget too (duplicate).
+        if ( defined('DOING_AJAX') && DOING_AJAX ) {
+            return;
+        }
+
         // Mobil detektálás
         $is_mobile = wp_is_mobile();
         $padding = $is_mobile ? '10px' : '15px';
-        
+
         // Progress bar megjelenítése
+        $progress_data = Gift_Progress_Bar::calculate_progress();
+        if ( ! $progress_data ) {
+            return;
+        }
         ?>
-        <div class="gpb-astra-wrapper" data-hook="<?php echo esc_attr(current_action()); ?>" style="padding: <?php echo esc_attr($padding); ?>; border-bottom: 1px solid #ececec; background: #f9f9f9;">
+        <div id="gpb-astra-progress-bar" class="gpb-astra-wrapper" data-hook="<?php echo esc_attr(current_action()); ?>" style="padding: <?php echo esc_attr($padding); ?>; border-bottom: 1px solid #ececec; background: #f9f9f9;">
             <?php
-            $progress_data = Gift_Progress_Bar::calculate_progress();
-            if ($progress_data) {
-                // Kompakt verzió használata
-                $frontend = GPB_Frontend::get_instance();
-                if (method_exists($frontend, 'render_mini_cart_progress')) {
-                    $frontend->render_mini_cart_progress($progress_data);
-                } else {
-                    // Fallback: shortcode
-                    echo do_shortcode('[gift_progress_bar]');
-                }
+            $frontend = GPB_Frontend::get_instance();
+            if (method_exists($frontend, 'render_mini_cart_progress')) {
+                $frontend->render_mini_cart_progress($progress_data);
+            } else {
+                echo do_shortcode('[gift_progress_bar]');
             }
             ?>
         </div>
@@ -345,14 +351,18 @@ class GPB_Astra_Compat {
 
         ob_start();
         ?>
-        <div class="gpb-astra-wrapper" style="padding: 15px; border-bottom: 1px solid #ececec; background: #f9f9f9;">
+        <div id="gpb-astra-progress-bar" class="gpb-astra-wrapper" style="padding: 15px; border-bottom: 1px solid #ececec; background: #f9f9f9;">
             <?php $frontend->render_mini_cart_progress($progress_data); ?>
         </div>
         <?php
         $html = ob_get_clean();
 
         if (!empty(trim($html))) {
-            $fragments['.gpb-astra-wrapper'] = $html;
+            // Use the unique ID selector so only the outer wrapper is replaced.
+            // The class selector '.gpb-astra-wrapper' would also match the inner
+            // .gpb-injected placeholder inside widget_shopping_cart_content,
+            // which caused a duplicate progress bar after every fragment refresh.
+            $fragments['#gpb-astra-progress-bar'] = $html;
         }
 
         return $fragments;

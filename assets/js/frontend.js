@@ -18,7 +18,8 @@
                     if (cached && (
                         cached['#gpb-mini-cart-progress'] === '' ||
                         cached['#gpb-progress-bar-wrapper'] === '' ||
-                        cached['.gpb-astra-wrapper'] === ''
+                        cached['.gpb-astra-wrapper'] === '' ||
+                        cached['#gpb-astra-progress-bar'] === ''
                     )) {
                         sessionStorage.removeItem(storageKeys[i]);
                     }
