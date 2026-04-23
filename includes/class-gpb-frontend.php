@@ -29,16 +29,14 @@ class GPB_Frontend {
         // Enqueue scripts and styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         
-        // Add progress bar to cart page - multiple hooks for compatibility
+        // Add progress bar to cart page
         if (get_option('gpb_enable_cart', 'yes') === 'yes') {
             add_action('woocommerce_before_cart', array($this, 'display_progress_bar'), 10);
-            add_action('woocommerce_before_cart_table', array($this, 'display_progress_bar'), 5);
         }
         
-        // Add progress bar to checkout page - multiple hooks for compatibility
+        // Add progress bar to checkout page
         if (get_option('gpb_enable_checkout', 'yes') === 'yes') {
             add_action('woocommerce_before_checkout_form', array($this, 'display_progress_bar'), 10);
-            add_action('woocommerce_checkout_before_customer_details', array($this, 'display_progress_bar'), 5);
         }
         
         // Add progress bar to mini cart (widget)

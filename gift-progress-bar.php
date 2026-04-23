@@ -202,7 +202,13 @@ class Gift_Progress_Bar {
         // Progress percentage: use the next (or last) threshold as the target
         $target_threshold = $next_level ? $next_level : end($thresholds);
         $target_type      = isset($target_threshold['type']) ? $target_threshold['type'] : 'amount';
-        $target_value     = $target_threshold['amount'];
+        $target_value     = floatval($target_threshold['amount']);
+        
+        // Guard against division by zero
+        if ($target_value <= 0) {
+            return null;
+        }
+        
         $current_value_for_percent = ($target_type === 'quantity') ? $cart_quantity : $cart_total;
         $progress_percent = min(100, ($current_value_for_percent / $target_value) * 100);
         
