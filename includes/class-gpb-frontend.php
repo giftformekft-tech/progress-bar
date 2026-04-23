@@ -279,18 +279,6 @@ class GPB_Frontend {
                 
             </div>
         </div>
-        <script type="text/javascript">
-        (function() {
-            // Immediate deduplication - remove duplicates right after render
-            if (typeof jQuery !== 'undefined') {
-                jQuery(function($) {
-                    $('.gpb-progress-bar-wrapper').each(function(i) {
-                        if (i > 0) $(this).remove();
-                    });
-                });
-            }
-        })();
-        </script>
         <?php
     }
     
@@ -356,39 +344,6 @@ class GPB_Frontend {
                 
             </div>
         </div>
-        <script type="text/javascript">
-        (function() {
-            // Immediate deduplication - remove duplicates right after render
-            if (typeof jQuery !== 'undefined') {
-                jQuery(function($) {
-                    $('.gpb-mini-cart-progress').each(function(i) {
-                        if (i > 0) $(this).remove();
-                    });
-                    
-                    // Debug: Check milestone positioning
-                    if (window.console && window.console.log) {
-                        console.log('GPB Debug: Mini cart milestones check');
-                        $('.gpb-mini-milestone').each(function(i) {
-                            var $m = $(this);
-                            console.log('Milestone ' + i + ':', {
-                                position: $m.css('position'),
-                                left: $m.css('left'),
-                                display: $m.css('display'),
-                                transform: $m.css('transform')
-                            });
-                        });
-                    }
-                    
-                    // Force absolute positioning
-                    $('.gpb-mini-milestone').css({
-                        'position': 'absolute',
-                        'display': 'block',
-                        'transform': 'translateX(-50%)'
-                    });
-                });
-            }
-        })();
-        </script>
         <?php
     }
     

@@ -98,19 +98,15 @@ class GPB_Astra_Compat {
         <?php
         $progress_html = ob_get_clean();
         
-        // Proper escaping for JavaScript string
-        $progress_html_escaped = str_replace(array("\r", "\n", "\t"), '', $progress_html);
-        $progress_html_escaped = addslashes($progress_html_escaped);
-        $progress_html_escaped = str_replace("'", "\\'", $progress_html_escaped);
-        $progress_html_escaped = str_replace('<script', '<\\/script', $progress_html_escaped);
-        $progress_html_escaped = str_replace('</script>', '<\\/script>', $progress_html_escaped);
+        // Safe encoding for JS string using json_encode
+        $progress_html_js = json_encode($progress_html);
         ?>
         
         <script type="text/javascript">
         (function($) {
             if (!$ || typeof $ === 'undefined') return;
             
-            var progressBarHTML = '<?php echo $progress_html_escaped; ?>';
+            var progressBarHTML = <?php echo $progress_html_js; ?>;
             var injected = false;
             var attempts = 0;
             var maxAttempts = 10;
