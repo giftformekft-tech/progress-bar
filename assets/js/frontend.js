@@ -25,6 +25,7 @@
     $(document).ready(function() {
         GPB_Frontend.init();
         GPB_Frontend.removeDuplicates();
+        GPB_Frontend.fixMiniCartButtonVisibility();
     });
     
     var GPB_Frontend = {
@@ -64,29 +65,32 @@
          */
         bindEvents: function() {
             var self = this;
-            
+
             // Update on cart updates
             $(document.body).on('updated_cart_totals updated_checkout', function() {
                 self.updateProgressBar();
                 // Remove duplicates after update
                 setTimeout(function() {
                     self.removeDuplicates();
+                    self.fixMiniCartButtonVisibility();
                 }, 100);
             });
-            
+
             // Listen for WooCommerce fragments update
             $(document.body).on('wc_fragments_refreshed wc_fragments_loaded', function() {
                 self.initAnimations();
                 // Remove duplicates after fragments refresh
                 setTimeout(function() {
                     self.removeDuplicates();
+                    self.fixMiniCartButtonVisibility();
                 }, 100);
             });
-            
+
             // Listen for mini cart opening
             $(document).on('click', '.cart-contents, [href*="cart"]', function() {
                 setTimeout(function() {
                     self.removeDuplicates();
+                    self.fixMiniCartButtonVisibility();
                 }, 200);
             });
         },
@@ -129,6 +133,52 @@
             });
         },
         
+        /**
+         * Wrap the mini cart total + buttons in a sticky footer so both
+         * remain visible at the bottom of the scroll area when the
+         * progress bar pushes content down.
+         */
+        fixMiniCartButtonVisibility: function() {
+            $('.widget_shopping_cart_content').each(function() {
+                var $content = $(this);
+
+                // Only act when our progress bar is present
+                if ($content.find('.gpb-mini-cart-progress').length === 0) {
+                    return;
+                }
+
+                // Skip if already wrapped
+                if ($content.find('.gpb-cart-footer').length > 0) {
+                    return;
+                }
+
+                var $total   = $content.find('.woocommerce-mini-cart__total');
+                var $buttons = $content.find('.woocommerce-mini-cart__buttons');
+
+                if ($buttons.length === 0) {
+                    return;
+                }
+
+                // Wrap total + buttons together so they stick as a unit
+                if ($total.length > 0) {
+                    $total.add($buttons).wrapAll('<div class="gpb-cart-footer"></div>');
+                    $buttons.addClass('gpb-wrapped');
+                } else {
+                    // No total row — just mark buttons as handled by the fallback CSS
+                    $buttons.addClass('gpb-wrapped');
+                    $buttons.css({
+                        'position': 'sticky',
+                        'bottom': '0',
+                        'background': '#ffffff',
+                        'z-index': '50',
+                        'padding-top': '10px',
+                        'border-top': '1px solid #f0f0f0',
+                        'margin-top': '0'
+                    });
+                }
+            });
+        },
+
         /**
          * Fix milestone positioning - ensure horizontal layout
          */

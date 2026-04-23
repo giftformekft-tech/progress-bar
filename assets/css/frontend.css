@@ -490,6 +490,46 @@ body .gpb-mini-milestone {
     margin-top: 15px;
 }
 
+/* ---------------------------------------------------------------
+ * Fix: cart buttons always visible when progress bar is shown.
+ * The progress bar adds height and pushes the checkout buttons
+ * below the visible area. Two-part fix:
+ *   1. Progress bar sticks to the top as the user scrolls down.
+ *   2. The total + buttons footer sticks to the bottom so the
+ *      user never has to scroll to reach the checkout buttons.
+ * --------------------------------------------------------------- */
+
+/* Progress bar sticks to the top of the scroll container */
+.widget_shopping_cart_content .gpb-mini-cart-progress {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #ffffff;
+}
+
+/* Wrap total + buttons in a sticky footer via JS-added class.
+ * The .gpb-cart-footer wrapper is injected by frontend.js so that
+ * both the subtotal row and the buttons can stick together. */
+.widget_shopping_cart_content .gpb-cart-footer {
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    z-index: 50;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 8px;
+}
+
+/* Fallback: if wrapping was not possible, at least keep buttons visible */
+.widget_shopping_cart_content .woocommerce-mini-cart__buttons:not(.gpb-wrapped) {
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    z-index: 50;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 0;
+}
+
 /* Compact Mode for Very Small Widgets */
 @media (max-width: 320px) {
     .gpb-mini-cart-progress {
