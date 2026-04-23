@@ -83,6 +83,10 @@ class GPB_Frontend {
      * Check if the progress bar should be shown on the current page
      */
     private function should_enqueue() {
+        // Guard: WooCommerce conditional functions may not be available in all contexts
+        if (!function_exists('is_cart') || !function_exists('is_checkout')) {
+            return false;
+        }
         // Always load on cart and checkout pages
         if (is_cart() || is_checkout()) {
             return true;
@@ -395,11 +399,6 @@ class GPB_Frontend {
             
             return $message;
         }
-        
-        // Sort by amount - use spaceship operator for type-safe comparison (avoids PHP 8 float→int warnings)
-        usort($thresholds, function($a, $b) {
-            return $a['amount'] <=> $b['amount'];
-        });
         
         if ($data['next_level']) {
             return sprintf(
