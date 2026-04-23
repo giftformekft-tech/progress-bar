@@ -109,16 +109,32 @@ class GPB_Astra_Compat {
             var progressBarHTML = <?php echo $progress_html_js; ?>;
             var injected = false;
             var debounceTimer = null;
+            var observer = null;
             
             function injectProgressBar() {
                 if (injected) return;
-                
-                var $target = $('.astra-cart-drawer-content, .widget_shopping_cart_content').first();
-                
-                if ($target.length && !$target.find('.gpb-injected').length) {
-                    $target.prepend(progressBarHTML);
+
+                // Strategy: inject BEFORE the sticky bottom section (subtotal + buttons)
+                // This keeps the bar in the fixed footer area — no scroll needed.
+                // Astra uses different class names depending on theme version.
+                var $footer = $(
+                    '.ast-side-cart-summary, ' +
+                    '.astra-cart-drawer-footer, ' +
+                    '.woocommerce-mini-cart__total'
+                ).first();
+
+                if ($footer.length && !$footer.prev('.gpb-injected').length) {
+                    $footer.before(progressBarHTML);
                     injected = true;
-                    // Stop observing once injected
+                    if (observer) observer.disconnect();
+                    return;
+                }
+
+                // Fallback: prepend into the content area if footer not found
+                var $content = $('.astra-cart-drawer-content, .widget_shopping_cart_content').first();
+                if ($content.length && !$content.find('.gpb-injected').length) {
+                    $content.prepend(progressBarHTML);
+                    injected = true;
                     if (observer) observer.disconnect();
                 }
             }
@@ -128,27 +144,25 @@ class GPB_Astra_Compat {
                 debounceTimer = setTimeout(injectProgressBar, 150);
             }
 
-            $(document).ready(function() {
-                setTimeout(injectProgressBar, 100);
-                
-                $(document).on('click', '.ast-cart-menu-wrap, .ast-header-cart, .header-cart-icon, [data-toggle-target*="cart"]', function() {
-                    injected = false;
-                    setTimeout(injectProgressBar, 300);
-                });
-                
-                $(document.body).on('wc_fragments_refreshed wc_fragments_loaded added_to_cart', function() {
-                    injected = false;
-                    debouncedInject();
-                });
-                
-                var observer = new MutationObserver(function(mutations) {
+            function startObserver() {
+                if (observer) observer.disconnect();
+                observer = new MutationObserver(function(mutations) {
                     if (injected) return;
                     for (var i = 0; i < mutations.length; i++) {
                         var added = mutations[i].addedNodes;
                         for (var j = 0; j < added.length; j++) {
                             var node = added[j];
                             if (node.nodeType === 1) {
-                                if (node.classList && (node.classList.contains('astra-cart-drawer-content') || node.querySelector && node.querySelector('.astra-cart-drawer-content'))) {
+                                var isCart = node.classList && (
+                                    node.classList.contains('astra-cart-drawer-content') ||
+                                    node.classList.contains('ast-side-cart-summary') ||
+                                    node.classList.contains('astra-cart-drawer-footer')
+                                );
+                                var hasCart = node.querySelector && (
+                                    node.querySelector('.astra-cart-drawer-content') ||
+                                    node.querySelector('.ast-side-cart-summary')
+                                );
+                                if (isCart || hasCart) {
                                     debouncedInject();
                                     return;
                                 }
@@ -156,8 +170,24 @@ class GPB_Astra_Compat {
                         }
                     }
                 });
-                
                 observer.observe(document.body, { childList: true, subtree: true });
+            }
+
+            $(document).ready(function() {
+                setTimeout(injectProgressBar, 100);
+                startObserver();
+                
+                $(document).on('click', '.ast-cart-menu-wrap, .ast-header-cart, .header-cart-icon, [data-toggle-target*="cart"]', function() {
+                    injected = false;
+                    startObserver();
+                    setTimeout(injectProgressBar, 300);
+                });
+                
+                $(document.body).on('wc_fragments_refreshed wc_fragments_loaded added_to_cart removed_from_cart', function() {
+                    injected = false;
+                    startObserver();
+                    debouncedInject();
+                });
             });
             
         })(jQuery);
@@ -311,13 +341,32 @@ class GPB_Astra_Compat {
             margin-bottom: 15px;
         }
         
-        /* Progress bar konténer */
+        /* Progress bar wrapper when injected before the footer summary */
+        .gpb-astra-wrapper.gpb-injected,
+        .gpb-injected {
+            padding: 12px 15px !important;
+            background: #f9f9f9 !important;
+            border-top: 1px solid #ececec !important;
+            border-bottom: 1px solid #ececec !important;
+            margin: 0 !important;
+        }
+
+        /* Progress bar konténer - kompakt a footer területen */
         .astra-cart-drawer .gpb-mini-cart-progress,
-        .astra-cart-drawer .gpb-progress-bar-wrapper {
+        .astra-cart-drawer .gpb-progress-bar-wrapper,
+        .gpb-injected .gpb-mini-cart-progress {
             background: transparent !important;
             box-shadow: none !important;
-            padding: 0 !important;
+            /* Override the 52px bottom padding that causes extra height */
+            padding: 10px 0 0 0 !important;
             margin: 0 !important;
+        }
+
+        /* Milestone icon area: reduce minimum height to save space */
+        .gpb-injected .gpb-mini-milestones,
+        .astra-cart-drawer .gpb-mini-milestones {
+            min-height: 34px !important;
+            padding-top: 8px !important;
         }
         
         .astra-cart-drawer .gpb-progress-bar-container {
