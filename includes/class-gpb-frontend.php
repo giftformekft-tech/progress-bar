@@ -420,31 +420,39 @@ class GPB_Frontend {
             return $fragments;
         }
         
-        // Skip if WooCommerce Blocks is handling the cart (Store API context)
-        // Blocks use their own REST endpoints, not the classic fragment system
+        // Skip during REST API requests (WooCommerce Blocks uses Store API)
         if (defined('REST_REQUEST') && REST_REQUEST) {
             return $fragments;
         }
         
         try {
             $progress_data = Gift_Progress_Bar::calculate_progress();
-            
-            // Main progress bar fragment
-            if (get_option('gpb_enable_cart', 'yes') === 'yes') {
-                ob_start();
-                if ($progress_data) {
+
+            // IMPORTANT: only add a fragment key if we have actual HTML to render.
+            // If we set an empty string, WooCommerce does $('selector').replaceWith('')
+            // which REMOVES the element and caches its absence in sessionStorage,
+            // making the progress bar permanently invisible on subsequent loads.
+
+            if ($progress_data) {
+                // Main progress bar fragment
+                if (self::get_cached_option('gpb_enable_cart', 'yes') === 'yes') {
+                    ob_start();
                     $this->render_progress_bar($progress_data);
+                    $html = ob_get_clean();
+                    if (!empty(trim($html))) {
+                        $fragments['#gpb-progress-bar-wrapper'] = $html;
+                    }
                 }
-                $fragments['#gpb-progress-bar-wrapper'] = ob_get_clean();
-            }
-            
-            // Mini cart progress bar fragment
-            if (get_option('gpb_enable_mini_cart', 'yes') === 'yes') {
-                ob_start();
-                if ($progress_data) {
+                
+                // Mini cart progress bar fragment
+                if (self::get_cached_option('gpb_enable_mini_cart', 'yes') === 'yes') {
+                    ob_start();
                     $this->render_mini_cart_progress($progress_data);
+                    $html = ob_get_clean();
+                    if (!empty(trim($html))) {
+                        $fragments['#gpb-mini-cart-progress'] = $html;
+                    }
                 }
-                $fragments['#gpb-mini-cart-progress'] = ob_get_clean();
             }
             
         } catch (Exception $e) {

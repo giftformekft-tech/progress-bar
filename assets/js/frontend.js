@@ -5,10 +5,26 @@
 (function($) {
     'use strict';
     
+    // One-time fix: clear stale WooCommerce fragment cache that may contain
+    // empty GPB fragments — forces a fresh fetch from the server.
+    (function() {
+        try {
+            var storageKeys = Object.keys(sessionStorage);
+            for (var i = 0; i < storageKeys.length; i++) {
+                if (storageKeys[i].indexOf('wc_fragments') === 0) {
+                    var cached = JSON.parse(sessionStorage.getItem(storageKeys[i]));
+                    if (cached && (cached['#gpb-mini-cart-progress'] === '' || cached['#gpb-progress-bar-wrapper'] === '')) {
+                        sessionStorage.removeItem(storageKeys[i]);
+                    }
+                }
+            }
+        } catch(e) {}
+    })();
+
     // Initialize on document ready
     $(document).ready(function() {
         GPB_Frontend.init();
-        GPB_Frontend.removeDuplicates(); // Remove any duplicates on load
+        GPB_Frontend.removeDuplicates();
     });
     
     var GPB_Frontend = {
