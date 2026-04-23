@@ -318,26 +318,43 @@ class GPB_Astra_Compat {
     
     /**
      * Astra fragments hozzáadása
+     *
+     * IMPORTANT: only add the fragment key when we have real HTML.
+     * Setting an empty string would cause WooCommerce to do
+     * $('.gpb-astra-wrapper').replaceWith('') and permanently remove
+     * the progress bar from the DOM after every page refresh / AJAX update.
      */
     public function add_astra_fragments($fragments) {
-        ob_start();
-        
-        if (!WC()->cart->is_empty()) {
-            $progress_data = Gift_Progress_Bar::calculate_progress();
-            if ($progress_data) {
-                $frontend = GPB_Frontend::get_instance();
-                if (method_exists($frontend, 'render_mini_cart_progress')) {
-                    ?>
-                    <div class="gpb-astra-wrapper" style="padding: 15px; border-bottom: 1px solid #ececec; background: #f9f9f9;">
-                        <?php $frontend->render_mini_cart_progress($progress_data); ?>
-                    </div>
-                    <?php
-                }
-            }
+        if (!function_exists('WC') || !WC()->cart) {
+            return $fragments;
         }
-        
-        $fragments['.gpb-astra-wrapper'] = ob_get_clean();
-        
+
+        if (WC()->cart->is_empty()) {
+            return $fragments;
+        }
+
+        $progress_data = Gift_Progress_Bar::calculate_progress();
+        if (!$progress_data) {
+            return $fragments;
+        }
+
+        $frontend = GPB_Frontend::get_instance();
+        if (!method_exists($frontend, 'render_mini_cart_progress')) {
+            return $fragments;
+        }
+
+        ob_start();
+        ?>
+        <div class="gpb-astra-wrapper" style="padding: 15px; border-bottom: 1px solid #ececec; background: #f9f9f9;">
+            <?php $frontend->render_mini_cart_progress($progress_data); ?>
+        </div>
+        <?php
+        $html = ob_get_clean();
+
+        if (!empty(trim($html))) {
+            $fragments['.gpb-astra-wrapper'] = $html;
+        }
+
         return $fragments;
     }
     
