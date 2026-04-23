@@ -108,75 +108,56 @@ class GPB_Astra_Compat {
             
             var progressBarHTML = <?php echo $progress_html_js; ?>;
             var injected = false;
-            var attempts = 0;
-            var maxAttempts = 10;
+            var debounceTimer = null;
             
-            // Injection funkció
             function injectProgressBar() {
-                if (injected || attempts >= maxAttempts) {
-                    return;
-                }
+                if (injected) return;
                 
-                attempts++;
-                
-                var found = false;
-                
-                // Helyes selector: .astra-cart-drawer-content
                 var $target = $('.astra-cart-drawer-content, .widget_shopping_cart_content').first();
                 
                 if ($target.length && !$target.find('.gpb-injected').length) {
-                    // Prepend - legelső elemként
                     $target.prepend(progressBarHTML);
                     injected = true;
-                    found = true;
-                } 
-                
-                // Ha még nem sikerült, próbáljuk újra
-                if (!found && attempts < maxAttempts) {
-                    setTimeout(injectProgressBar, 300);
+                    // Stop observing once injected
+                    if (observer) observer.disconnect();
                 }
             }
             
-            // Injection indítása
+            function debouncedInject() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(injectProgressBar, 150);
+            }
+
             $(document).ready(function() {
-                // Azonnali próbálkozás
                 setTimeout(injectProgressBar, 100);
                 
-                // Cart icon kattintás
                 $(document).on('click', '.ast-cart-menu-wrap, .ast-header-cart, .header-cart-icon, [data-toggle-target*="cart"]', function() {
                     injected = false;
-                    attempts = 0;
                     setTimeout(injectProgressBar, 300);
                 });
                 
-                // WooCommerce events
                 $(document.body).on('wc_fragments_refreshed wc_fragments_loaded added_to_cart', function() {
                     injected = false;
-                    attempts = 0;
-                    setTimeout(injectProgressBar, 200);
+                    debouncedInject();
                 });
                 
-                // MutationObserver
                 var observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.addedNodes.length) {
-                            $(mutation.addedNodes).each(function() {
-                                if (this.nodeType === 1) {
-                                    var $node = $(this);
-                                    if ($node.is('.astra-cart-drawer-content') ||
-                                        $node.find('.astra-cart-drawer-content').length) {
-                                        setTimeout(injectProgressBar, 100);
-                                    }
+                    if (injected) return;
+                    for (var i = 0; i < mutations.length; i++) {
+                        var added = mutations[i].addedNodes;
+                        for (var j = 0; j < added.length; j++) {
+                            var node = added[j];
+                            if (node.nodeType === 1) {
+                                if (node.classList && (node.classList.contains('astra-cart-drawer-content') || node.querySelector && node.querySelector('.astra-cart-drawer-content'))) {
+                                    debouncedInject();
+                                    return;
                                 }
-                            });
+                            }
                         }
-                    });
+                    }
                 });
                 
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
+                observer.observe(document.body, { childList: true, subtree: true });
             });
             
         })(jQuery);

@@ -69,10 +69,45 @@ class GPB_Frontend {
     }
     
     /**
+     * Get cached option value (avoids repeated DB reads per request)
+     */
+    private static function get_cached_option($key, $default = '') {
+        static $cache = array();
+        if (!isset($cache[$key])) {
+            $cache[$key] = get_option($key, $default);
+        }
+        return $cache[$key];
+    }
+
+    /**
+     * Check if the progress bar should be shown on the current page
+     */
+    private function should_enqueue() {
+        // Always load on cart and checkout pages
+        if (is_cart() || is_checkout()) {
+            return true;
+        }
+        // Load if the current page has the shortcode
+        global $post;
+        if ($post && has_shortcode($post->post_content, 'gift_progress_bar')) {
+            return true;
+        }
+        // Load if mini cart is enabled (widget can appear on any page)
+        if (self::get_cached_option('gpb_enable_mini_cart', 'yes') === 'yes') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Enqueue scripts and styles
      */
     public function enqueue_scripts() {
-        // Always enqueue CSS for mini cart (it can appear anywhere via widget)
+        // Only load assets on pages where we actually show the progress bar
+        if (!$this->should_enqueue()) {
+            return;
+        }
+
         // Enqueue Dashicons (needed for milestone icons)
         wp_enqueue_style('dashicons');
         
@@ -84,48 +119,23 @@ class GPB_Frontend {
             GPB_VERSION
         );
         
-        // Add dynamic CSS for colors
-        $bar_color = get_option('gpb_bar_color', '#4CAF50');
-        $bg_color = get_option('gpb_bg_color', '#e0e0e0');
-        $text_color = get_option('gpb_text_color', '#333333');
+        // Add dynamic CSS for colors - cache the brightness calculation
+        $bar_color  = self::get_cached_option('gpb_bar_color', '#4CAF50');
+        $bg_color   = self::get_cached_option('gpb_bg_color', '#e0e0e0');
+        $text_color = self::get_cached_option('gpb_text_color', '#333333');
+        $bar_color_light = $this->adjust_brightness($bar_color, 20); // calc once, reuse
         
         $custom_css = "
-            .gpb-progress-bar-container {
-                color: {$text_color};
-            }
-            .gpb-progress-bar-bg {
-                background-color: {$bg_color};
-            }
-            .gpb-progress-bar-fill {
-                background: linear-gradient(90deg, {$bar_color} 0%, " . $this->adjust_brightness($bar_color, 20) . " 100%);
-            }
-            .gpb-milestone.completed .gpb-milestone-icon {
-                background-color: {$bar_color};
-                border-color: {$bar_color};
-            }
-            .gpb-milestone.active .gpb-milestone-icon {
-                border-color: {$bar_color};
-                color: {$bar_color};
-            }
-            
-            /* Mini cart colors */
-            .gpb-mini-cart-container {
-                color: {$text_color};
-            }
-            .gpb-mini-progress-bg {
-                background-color: {$bg_color};
-            }
-            .gpb-mini-progress-fill {
-                background: linear-gradient(90deg, {$bar_color} 0%, " . $this->adjust_brightness($bar_color, 20) . " 100%);
-            }
-            .gpb-mini-milestone.completed .gpb-mini-milestone-icon {
-                background-color: {$bar_color};
-                border-color: {$bar_color};
-            }
-            .gpb-mini-milestone.active .gpb-mini-milestone-icon {
-                border-color: {$bar_color};
-                color: {$bar_color};
-            }
+            .gpb-progress-bar-container { color: {$text_color}; }
+            .gpb-progress-bar-bg { background-color: {$bg_color}; }
+            .gpb-progress-bar-fill { background: linear-gradient(90deg, {$bar_color} 0%, {$bar_color_light} 100%); }
+            .gpb-milestone.completed .gpb-milestone-icon { background-color: {$bar_color}; border-color: {$bar_color}; }
+            .gpb-milestone.active .gpb-milestone-icon { border-color: {$bar_color}; color: {$bar_color}; }
+            .gpb-mini-cart-container { color: {$text_color}; }
+            .gpb-mini-progress-bg { background-color: {$bg_color}; }
+            .gpb-mini-progress-fill { background: linear-gradient(90deg, {$bar_color} 0%, {$bar_color_light} 100%); }
+            .gpb-mini-milestone.completed .gpb-mini-milestone-icon { background-color: {$bar_color}; border-color: {$bar_color}; }
+            .gpb-mini-milestone.active .gpb-mini-milestone-icon { border-color: {$bar_color}; color: {$bar_color}; }
         ";
         
         wp_add_inline_style('gpb-frontend-css', $custom_css);
@@ -139,10 +149,10 @@ class GPB_Frontend {
             true
         );
         
-        // Localize script
+        // Localize script (nonce only generated when script is actually needed)
         wp_localize_script('gpb-frontend-js', 'gpbData', array(
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('gpb_nonce')
+            'nonce'    => wp_create_nonce('gpb_nonce')
         ));
     }
     
