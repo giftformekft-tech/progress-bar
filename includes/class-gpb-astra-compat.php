@@ -127,6 +127,7 @@ class GPB_Astra_Compat {
                     $footer.before(progressBarHTML);
                     injected = true;
                     if (observer) observer.disconnect();
+                    fixAstraLayout();
                     return;
                 }
 
@@ -137,6 +138,25 @@ class GPB_Astra_Compat {
                     injected = true;
                     if (observer) observer.disconnect();
                 }
+                fixAstraLayout();
+            }
+
+            /**
+             * Ensure the Astra drawer uses flex layout so the checkout
+             * button is always visible without scrolling.
+             * CSS handles the static case; this JS covers AJAX reloads
+             * where inline styles (display:block on the widget) may
+             * override our stylesheet rules.
+             */
+            function fixAstraLayout() {
+                var $drawerContent = $('.astra-cart-drawer .astra-cart-drawer-content');
+                if (!$drawerContent.length) return;
+
+                // Override the inline display:block on the WooCommerce widget
+                $drawerContent.children('.widget.widget_shopping_cart').css('display', 'flex');
+
+                // Ensure widget_shopping_cart_content is also flex
+                $drawerContent.find('.widget_shopping_cart_content').css('display', 'flex');
             }
             
             function debouncedInject() {
@@ -174,19 +194,20 @@ class GPB_Astra_Compat {
             }
 
             $(document).ready(function() {
-                setTimeout(injectProgressBar, 100);
+                setTimeout(function() { injectProgressBar(); fixAstraLayout(); }, 100);
                 startObserver();
-                
+
                 $(document).on('click', '.ast-cart-menu-wrap, .ast-header-cart, .header-cart-icon, [data-toggle-target*="cart"]', function() {
                     injected = false;
                     startObserver();
-                    setTimeout(injectProgressBar, 300);
+                    setTimeout(function() { injectProgressBar(); fixAstraLayout(); }, 300);
                 });
-                
+
                 $(document.body).on('wc_fragments_refreshed wc_fragments_loaded added_to_cart removed_from_cart', function() {
                     injected = false;
                     startObserver();
                     debouncedInject();
+                    setTimeout(fixAstraLayout, 200);
                 });
             });
             
@@ -529,6 +550,78 @@ class GPB_Astra_Compat {
         .astra-cart-drawer .gpb-astra-wrapper {
             position: relative;
             z-index: 1;
+        }
+
+        /* ================================================================
+         * Fix: checkout button always visible in Astra cart drawer.
+         *
+         * DOM layout inside .astra-cart-drawer-content:
+         *   .gpb-astra-wrapper          ← progress bar (PHP-rendered)
+         *   .widget.widget_shopping_cart
+         *     .widget_shopping_cart_content
+         *       ul.woocommerce-mini-cart   ← items (should scroll)
+         *       .woocommerce-mini-cart__total
+         *       .woocommerce-mini-cart__buttons  ← must always be visible
+         *
+         * Solution: flex column on the outer container so the progress bar
+         * is pinned at the top, the widget fills remaining space, and the
+         * items list scrolls while the total + buttons stay at the bottom.
+         * ================================================================ */
+
+        /* Outer drawer content: flex column, items scroll inside */
+        .astra-cart-drawer .astra-cart-drawer-content {
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+        }
+
+        /* Progress bar wrapper: never shrink, always at top */
+        .astra-cart-drawer .astra-cart-drawer-content > .gpb-astra-wrapper {
+            flex-shrink: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* WooCommerce widget: takes all remaining height */
+        .astra-cart-drawer .astra-cart-drawer-content > .widget.widget_shopping_cart {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        /* Inner widget content: flex column, constrained to widget height */
+        .astra-cart-drawer .astra-cart-drawer-content .widget_shopping_cart_content {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Cart items list: grows and scrolls */
+        .astra-cart-drawer .astra-cart-drawer-content .widget_shopping_cart_content > ul.woocommerce-mini-cart {
+            flex: 1 1 auto !important;
+            overflow-y: auto !important;
+            min-height: 0 !important;
+        }
+
+        /* Total + buttons: always visible at the bottom, never scrolled away */
+        .astra-cart-drawer .astra-cart-drawer-content .widget_shopping_cart_content > .woocommerce-mini-cart__total,
+        .astra-cart-drawer .astra-cart-drawer-content .widget_shopping_cart_content > .woocommerce-mini-cart__buttons {
+            flex-shrink: 0 !important;
+            background: #ffffff;
+        }
+
+        .astra-cart-drawer .astra-cart-drawer-content .widget_shopping_cart_content > .woocommerce-mini-cart__total {
+            border-top: 1px solid #ececec;
+            padding: 12px 15px !important;
+            margin: 0 !important;
+        }
+
+        .astra-cart-drawer .astra-cart-drawer-content .widget_shopping_cart_content > .woocommerce-mini-cart__buttons {
+            padding: 12px 15px !important;
+            margin: 0 !important;
         }
         </style>
         <?php
