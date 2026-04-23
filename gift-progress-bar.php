@@ -153,9 +153,9 @@ class Gift_Progress_Bar {
         }
         unset($t);
         
-        // Sort by amount
+        // Sort by amount - use spaceship operator for type-safe comparison (avoids PHP 8 float→int warnings)
         usort($thresholds, function($a, $b) {
-            return $a['amount'] - $b['amount'];
+            return $a['amount'] <=> $b['amount'];
         });
         
         return $thresholds;

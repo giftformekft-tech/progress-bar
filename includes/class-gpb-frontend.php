@@ -386,6 +386,11 @@ class GPB_Frontend {
             return $message;
         }
         
+        // Sort by amount - use spaceship operator for type-safe comparison (avoids PHP 8 float→int warnings)
+        usort($thresholds, function($a, $b) {
+            return $a['amount'] <=> $b['amount'];
+        });
+        
         if ($data['next_level']) {
             return sprintf(
                 esc_html__('Már csak %s kell az ajándékhoz: %s', 'gift-progress-bar'),
@@ -398,39 +403,47 @@ class GPB_Frontend {
     }
     
     /**
-     * Add cart fragments for AJAX updates
+     * Add cart fragments for AJAX updates (classic WooCommerce only)
      */
     public function cart_fragments($fragments) {
-        // Reset global flags for AJAX updates
-        global $gpb_main_progress_displayed, $gpb_mini_cart_displayed;
-        $gpb_main_progress_displayed = false;
-        $gpb_mini_cart_displayed = false;
-        
-        // Main progress bar fragment
-        ob_start();
-        
-        $progress_data = Gift_Progress_Bar::calculate_progress();
-        
-        // Only generate if cart display is enabled
-        if ($progress_data && get_option('gpb_enable_cart', 'yes') === 'yes') {
-            $this->render_progress_bar($progress_data);
+        // Skip if WooCommerce cart is not available
+        if (!function_exists('WC') || !WC()->cart) {
+            return $fragments;
         }
         
-        $fragments['#gpb-progress-bar-wrapper'] = ob_get_clean();
-        
-        // Mini cart progress bar fragment
-        ob_start();
-        
-        // Only generate if mini cart display is enabled
-        if ($progress_data && get_option('gpb_enable_mini_cart', 'yes') === 'yes') {
-            $this->render_mini_cart_progress($progress_data);
+        // Skip if WooCommerce Blocks is handling the cart (Store API context)
+        // Blocks use their own REST endpoints, not the classic fragment system
+        if (defined('REST_REQUEST') && REST_REQUEST) {
+            return $fragments;
         }
         
-        $fragments['#gpb-mini-cart-progress'] = ob_get_clean();
-        
-        // Reset flags again after rendering
-        $gpb_main_progress_displayed = false;
-        $gpb_mini_cart_displayed = false;
+        try {
+            $progress_data = Gift_Progress_Bar::calculate_progress();
+            
+            // Main progress bar fragment
+            if (get_option('gpb_enable_cart', 'yes') === 'yes') {
+                ob_start();
+                if ($progress_data) {
+                    $this->render_progress_bar($progress_data);
+                }
+                $fragments['#gpb-progress-bar-wrapper'] = ob_get_clean();
+            }
+            
+            // Mini cart progress bar fragment
+            if (get_option('gpb_enable_mini_cart', 'yes') === 'yes') {
+                ob_start();
+                if ($progress_data) {
+                    $this->render_mini_cart_progress($progress_data);
+                }
+                $fragments['#gpb-mini-cart-progress'] = ob_get_clean();
+            }
+            
+        } catch (Exception $e) {
+            // Clean up any open output buffers to avoid corrupting the AJAX response
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+        }
         
         return $fragments;
     }
