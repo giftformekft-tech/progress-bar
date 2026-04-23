@@ -7,13 +7,19 @@
     
     // One-time fix: clear stale WooCommerce fragment cache that may contain
     // empty GPB fragments — forces a fresh fetch from the server.
+    // An empty string fragment causes WooCommerce to replaceWith('') which
+    // permanently removes the progress bar element from the DOM.
     (function() {
         try {
             var storageKeys = Object.keys(sessionStorage);
             for (var i = 0; i < storageKeys.length; i++) {
                 if (storageKeys[i].indexOf('wc_fragments') === 0) {
                     var cached = JSON.parse(sessionStorage.getItem(storageKeys[i]));
-                    if (cached && (cached['#gpb-mini-cart-progress'] === '' || cached['#gpb-progress-bar-wrapper'] === '')) {
+                    if (cached && (
+                        cached['#gpb-mini-cart-progress'] === '' ||
+                        cached['#gpb-progress-bar-wrapper'] === '' ||
+                        cached['.gpb-astra-wrapper'] === ''
+                    )) {
                         sessionStorage.removeItem(storageKeys[i]);
                     }
                 }
