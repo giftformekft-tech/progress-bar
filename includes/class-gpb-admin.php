@@ -52,6 +52,7 @@ class GPB_Admin {
         register_setting('gpb_settings', 'gpb_thresholds');
         register_setting('gpb_settings', 'gpb_enable_cart');
         register_setting('gpb_settings', 'gpb_enable_checkout');
+        register_setting('gpb_settings', 'gpb_enable_mini_cart');
         register_setting('gpb_settings', 'gpb_bar_color');
         register_setting('gpb_settings', 'gpb_bg_color');
         register_setting('gpb_settings', 'gpb_text_color');
@@ -259,17 +260,17 @@ class GPB_Admin {
         // Save thresholds
         $thresholds = array();
         if (isset($_POST['gpb_thresholds']) && is_array($_POST['gpb_thresholds'])) {
-            foreach ($_POST['gpb_thresholds'] as $threshold) {
+            foreach (wp_unslash($_POST['gpb_thresholds']) as $threshold) {
                 if (!empty($threshold['amount']) && !empty($threshold['reward'])) {
                     $type = (isset($threshold['type']) && $threshold['type'] === 'quantity') ? 'quantity' : 'amount';
-                    $bar_position = (isset($threshold['bar_position']) && $threshold['bar_position'] !== '') 
-                                    ? min(100, max(0, floatval($threshold['bar_position']))) 
+                    $bar_position = (isset($threshold['bar_position']) && $threshold['bar_position'] !== '')
+                                    ? min(100, max(0, floatval($threshold['bar_position'])))
                                     : '';
                     $thresholds[] = array(
                         'type'         => $type,
                         'amount'       => ($type === 'quantity') ? intval($threshold['amount']) : floatval($threshold['amount']),
                         'reward'       => sanitize_text_field($threshold['reward']),
-                        'icon'         => sanitize_text_field($threshold['icon']),
+                        'icon'         => sanitize_text_field(isset($threshold['icon']) ? $threshold['icon'] : ''),
                         'bar_position' => $bar_position
                     );
                 }
@@ -287,9 +288,13 @@ class GPB_Admin {
         update_option('gpb_enable_mini_cart', $enable_mini_cart);
         
         // Save color settings
-        update_option('gpb_bar_color', sanitize_hex_color($_POST['gpb_bar_color']));
-        update_option('gpb_bg_color', sanitize_hex_color($_POST['gpb_bg_color']));
-        update_option('gpb_text_color', sanitize_hex_color($_POST['gpb_text_color']));
+        $bar_color = sanitize_hex_color(isset($_POST['gpb_bar_color']) ? wp_unslash($_POST['gpb_bar_color']) : '');
+        $bg_color = sanitize_hex_color(isset($_POST['gpb_bg_color']) ? wp_unslash($_POST['gpb_bg_color']) : '');
+        $text_color = sanitize_hex_color(isset($_POST['gpb_text_color']) ? wp_unslash($_POST['gpb_text_color']) : '');
+
+        update_option('gpb_bar_color', $bar_color ? $bar_color : '#4CAF50');
+        update_option('gpb_bg_color', $bg_color ? $bg_color : '#e0e0e0');
+        update_option('gpb_text_color', $text_color ? $text_color : '#333333');
         
         // Show detailed success message
         $messages = array();
@@ -306,7 +311,7 @@ class GPB_Admin {
             echo '<div class="notice notice-info"><p>';
             echo '<strong>🧪 Tesztelés:</strong><br>';
             if ($enable_cart === 'yes') {
-                echo '1. Látogasd meg a kosár oldalt: <a href="' . wc_get_cart_url() . '" target="_blank">Kosár megtekintése</a><br>';
+                echo '1. Látogasd meg a kosár oldalt: <a href="' . esc_url(wc_get_cart_url()) . '" target="_blank" rel="noopener noreferrer">Kosár megtekintése</a><br>';
             }
             if ($enable_mini_cart === 'yes') {
                 echo '2. Nézd meg a mini cart widget-et (oldalsáv vagy menü)<br>';
